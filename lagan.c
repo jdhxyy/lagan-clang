@@ -14,11 +14,17 @@ static char gLevelCh[] = {'O', 'D', 'I', 'W', 'E'};
 
 static LaganPrintFunc gOutput = NULL;
 static LaganGetTimeFunc gGetTime = NULL;
+static gIsLoad = false;
 
 // LaganLoad 模块载入
 void LaganLoad(LaganPrintFunc print, LaganGetTimeFunc getTime) {
+    if (gIsLoad) {
+        return;
+    }
+
     gOutput = print;
     gGetTime = getTime;
+    gIsLoad = true;
 }
 
 // LaganSetFilterLevel 设置过滤日志等级
@@ -33,7 +39,7 @@ LaganLevel LaganGetFilterLevel(void) {
 
 // LaganPrint 日志打印
 void LaganPrint(char* tag, LaganLevel level, char *format, ...) {
-    if (tag == NULL || gIsPause) {
+    if (gIsLoad == false || gIsPause) {
         return;
     }
     if (gFilterLevel == LAGAN_LEVEL_OFF || level < gFilterLevel || tag == NULL || 
@@ -67,7 +73,7 @@ void LaganPrint(char* tag, LaganLevel level, char *format, ...) {
 
 // LaganPrintHex 打印字节流
 void LaganPrintHex(char* tag, LaganLevel level, uint8_t* bytes, int size) {
-    if (gIsPause) {
+    if (gIsLoad == false || gIsPause) {
         return;
     }
     if (gFilterLevel == LAGAN_LEVEL_OFF || level < gFilterLevel) {
