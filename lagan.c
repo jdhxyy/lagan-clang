@@ -14,7 +14,7 @@ static char gLevelCh[] = {'O', 'D', 'I', 'W', 'E'};
 
 static LaganPrintFunc gOutput = NULL;
 static LaganGetTimeFunc gGetTime = NULL;
-static gIsLoad = false;
+static bool gIsLoad = false;
 
 // LaganLoad ƒ£øÈ‘ÿ»Î
 void LaganLoad(LaganPrintFunc print, LaganGetTimeFunc getTime) {
