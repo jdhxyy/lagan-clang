@@ -54,8 +54,13 @@ typedef void (*LaganPrintFunc)(uint8_t* bytes, int size);
 // LaganTime 读取时间
 typedef LaganTime (*LaganGetTimeFunc)(void);
 
+// LaganGetLocalTimeFunc 读取本地时间.返回值是us级精度的本地时间
+typedef uint64_t (*LaganGetLocalTimeFunc)(void);
+
 // LaganLoad 模块载入
-void LaganLoad(LaganPrintFunc print, LaganGetTimeFunc getTime);
+// getTime是读取北京时间,getLocalTime是读取本地时间,进度是us
+// 如果不需要使用哪个时间,就将其设置为NULL.如果两个都有效,则使用的是北京时间
+void LaganLoad(LaganPrintFunc print, LaganGetTimeFunc getTime, LaganGetLocalTimeFunc getLocalTime);
 
 // LaganSetFilterLevel 设置过滤日志等级
 void LaganSetFilterLevel(LaganLevel level);

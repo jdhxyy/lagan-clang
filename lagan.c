@@ -14,16 +14,22 @@ static char gLevelCh[] = {'O', 'D', 'I', 'W', 'E'};
 
 static LaganPrintFunc gOutput = NULL;
 static LaganGetTimeFunc gGetTime = NULL;
+static LaganGetLocalTimeFunc gGetLocalTime = NULL;
 static bool gIsLoad = false;
 
 // LaganLoad 模块载入
-void LaganLoad(LaganPrintFunc print, LaganGetTimeFunc getTime) {
+// getTime是读取北京时间,getLocalTime是读取本地时间,进度是us
+// 如果不需要使用哪个时间,就将其设置为NULL.如果两个都有效,则使用的是北京时间
+void LaganLoad(LaganPrintFunc print, LaganGetTimeFunc getTime, LaganGetLocalTimeFunc getLocalTime) {
     if (gIsLoad) {
         return;
     }
 
     gOutput = print;
     gGetTime = getTime;
+    if (gGetTime == NULL) {
+        gGetLocalTime = getLocalTime;   
+    }
     gIsLoad = true;
 }
 
@@ -50,9 +56,18 @@ void LaganPrint(char* tag, LaganLevel level, char *format, ...) {
     char buf[LAGAN_RECORD_MAX_SIZE_DEFAULT] = {0};
 
     // 前缀
-    LaganTime time = gGetTime();
-    sprintf(buf, "%02d/%02d/%02d %02d:%02d:%02d.%06d %c/%s ", time.Year, time.Month, time.Day, time.Hour, time.Minute,
-        time.Second, time.Us, gLevelCh[level], tag);
+    if (gGetTime != NULL) {
+        LaganTime time = gGetTime();
+        sprintf(buf, "%02d/%02d/%02d %02d:%02d:%02d.%06d %c/%s ", time.Year, time.Month, time.Day, time.Hour, time.Minute,
+            time.Second, time.Us, gLevelCh[level], tag);
+    } else {
+        uint64_t us = gGetLocalTime();
+        int second = (int)(us / 1000000);
+        us = us % 1000000;
+        int ms = (int)(us / 1000);
+        us = us % 1000;
+        sprintf(buf, "%06d/%03d/%03d %c/%s ", second, ms, (int)us, gLevelCh[level], tag);
+    }
     gOutput((uint8_t*)buf, (int)strlen(buf));
 
     // 正文

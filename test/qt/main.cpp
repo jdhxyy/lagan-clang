@@ -3,10 +3,12 @@
 
 extern "C" {
     #include "lagan.h"
+    #include <string.h>
 }
 
 static void print(uint8_t* bytes, int size);
 static LaganTime getTime(void);
+static uint64_t getLocalTime(void);
 
 static void case1(void);
 static void case2(void);
@@ -15,7 +17,8 @@ static void case3(void);
 int main(int argc, char *argv[]) {
     QCoreApplication a(argc, argv);
 
-    LaganLoad(print, getTime);
+//    LaganLoad(print, getTime, NULL);
+    LaganLoad(print, NULL, getLocalTime);
 
     case1();
     case2();
@@ -41,6 +44,11 @@ static LaganTime getTime(void) {
     time.Second = now.second();
     time.Us = now.msec() * 1000;
     return time;
+}
+
+static uint64_t getLocalTime(void) {
+    QTime now = QTime::currentTime();
+    return (uint64_t)(now.msecsSinceStartOfDay()) * 1000;
 }
 
 static void case1(void) {
