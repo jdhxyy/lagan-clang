@@ -19,10 +19,10 @@ typedef enum {
 } LaganLevel;
 
 // 模块名最大长度
-#define LAGAN_MODULE_NAME_LEN_MAX 100
+#define LAGAN_MODULE_NAME_LEN_MAX 64
 
 // 默认的日志记录最大字节数
-#define LAGAN_RECORD_MAX_SIZE_DEFAULT 512
+#define LAGAN_RECORD_MAX_SIZE_DEFAULT 128
 
 // 默认过滤级别
 #define LAGAN_FILTER_LEVEL_DEAFULT LAGAN_LEVEL_DEBUG
