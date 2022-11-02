@@ -1,7 +1,7 @@
 // Copyright 2020-2021 The jdh99 Authors. All rights reserved.
-// ʵʱ����־��.�������ڴ��ڵ�����־��ӡ
+// 实时流日志库.可以用于串口等流日志打印
 // Authors: jdh99 <jdh821@163.com>
-// laganȡ���������˼ҵ�ˮ��ͷ"����"
+// lagan取名来自于宜家的水龙头"拉根"
 
 #include "lagan.h"
 #include <stdio.h>
@@ -17,9 +17,9 @@ static LaganGetTimeFunc gGetTime = NULL;
 static LaganGetLocalTimeFunc gGetLocalTime = NULL;
 static bool gIsLoad = false;
 
-// LaganLoad ģ������
-// getTime�Ƕ�ȡ����ʱ��,getLocalTime�Ƕ�ȡ����ʱ��,������us
-// �������Ҫʹ���ĸ�ʱ��,�ͽ�������ΪNULL.�����������Ч,��ʹ�õ��Ǳ���ʱ��
+// LaganLoad 模块载入
+// getTime是读取北京时间,getLocalTime是读取本地时间,进度是us
+// 如果不需要使用哪个时间,就将其设置为NULL.如果两个都有效,则使用的是北京时间
 void LaganLoad(LaganPrintFunc print, LaganGetTimeFunc getTime, LaganGetLocalTimeFunc getLocalTime) {
     if (gIsLoad) {
         return;
@@ -33,17 +33,17 @@ void LaganLoad(LaganPrintFunc print, LaganGetTimeFunc getTime, LaganGetLocalTime
     gIsLoad = true;
 }
 
-// LaganSetFilterLevel ���ù�����־�ȼ�
+// LaganSetFilterLevel 设置过滤日志等级
 void LaganSetFilterLevel(LaganLevel level) {
     gFilterLevel = level;
 }
 
-// PaxGetFilterLevel ��ʾ������־�ȼ�
+// PaxGetFilterLevel 显示过滤日志等级
 LaganLevel LaganGetFilterLevel(void) {
     return gFilterLevel;
 }
 
-// LaganPrint ��־��ӡ
+// LaganPrint 日志打印
 void LaganPrint(char* tag, LaganLevel level, char *format, ...) {
     if (gIsLoad == false || gIsPause) {
         return;
@@ -55,7 +55,7 @@ void LaganPrint(char* tag, LaganLevel level, char *format, ...) {
 
     char buf[LAGAN_RECORD_MAX_SIZE_DEFAULT] = {0};
 
-    // ǰ׺
+    // 前缀
     if (gGetTime != NULL) {
         LaganTime time = gGetTime();
         sprintf(buf, "%02d/%02d/%02d %02d:%02d:%02d.%06d %c/%s ", time.Year, time.Month, time.Day, time.Hour, time.Minute,
@@ -70,7 +70,7 @@ void LaganPrint(char* tag, LaganLevel level, char *format, ...) {
     }
     gOutput((uint8_t*)buf, (int)strlen(buf));
 
-    // ����
+    // 正文
     va_list args;
 	va_start(args, format);
 
@@ -82,11 +82,11 @@ void LaganPrint(char* tag, LaganLevel level, char *format, ...) {
 
     va_end(args);
 
-    // ��׺
+    // 后缀
     gOutput((uint8_t*)"\n", 1);
 }
 
-// LaganPrintHex ��ӡ�ֽ���
+// LaganPrintHex 打印字节流
 void LaganPrintHex(char* tag, LaganLevel level, uint8_t* bytes, int size) {
     if (gIsLoad == false || gIsPause) {
         return;
@@ -124,17 +124,34 @@ void LaganPrintHex(char* tag, LaganLevel level, uint8_t* bytes, int size) {
     }
 }
 
-// PaxPause ��ͣ��־��ӡ
+// PaxPause 暂停日志打印
 void LaganPause(void) {
     gIsPause = true;
 }
 
-// PaxResume �ָ���־��ӡ
+// PaxResume 恢复日志打印
 void LaganResume(void) {
     gIsPause = false;
 }
 
-// PaxIsPause �Ƿ���ͣ
+// PaxIsPause 是否暂停
 bool LaganIsPause(void) {
     return gIsPause;
+}
+
+// LaganRaw 原始打印.无时间戳和模块信息
+void LaganRaw(char *format, ...) {
+    char buf[LAGAN_RECORD_MAX_SIZE_DEFAULT] = {0};
+
+    // 正文
+    va_list args;
+    va_start(args, format);
+
+    int len = vsnprintf(buf, LAGAN_RECORD_MAX_SIZE_DEFAULT - 1, format, args);
+    if (len > LAGAN_RECORD_MAX_SIZE_DEFAULT || len < 0) {
+        len = LAGAN_RECORD_MAX_SIZE_DEFAULT;
+    }
+    gOutput((uint8_t*)buf, (int)strlen(buf));
+
+    va_end(args);
 }

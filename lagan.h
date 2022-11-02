@@ -1,7 +1,7 @@
 // Copyright 2020-2021 The jdh99 Authors. All rights reserved.
-// ÊµÊ±Á÷ÈÕÖ¾¿â.¿ÉÒÔÓÃÓÚ´®¿ÚµÈÁ÷ÈÕÖ¾´òÓ¡
+// å®æ—¶æµæ—¥å¿—åº“.å¯ä»¥ç”¨äºä¸²å£ç­‰æµæ—¥å¿—æ‰“å°
 // Authors: jdh99 <jdh821@163.com>
-// laganÈ¡ÃûÀ´×ÔÓÚÒË¼ÒµÄË®ÁúÍ·"À­¸ù"
+// laganå–åæ¥è‡ªäºå®œå®¶çš„æ°´é¾™å¤´"æ‹‰æ ¹"
 
 #ifndef LAGAN_H
 #define LAGAN_H
@@ -9,7 +9,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-// ÈÕÖ¾¼¶±ğ
+// æ—¥å¿—çº§åˆ«
 typedef enum {
     LAGAN_LEVEL_OFF = 0,
     LAGAN_LEVEL_DEBUG,
@@ -18,25 +18,26 @@ typedef enum {
     LAGAN_LEVEL_ERROR
 } LaganLevel;
 
-// Ä£¿éÃû×î´ó³¤¶È
+// æ¨¡å—åæœ€å¤§é•¿åº¦
 #define LAGAN_MODULE_NAME_LEN_MAX 64
 
-// Ä¬ÈÏµÄÈÕÖ¾¼ÇÂ¼×î´ó×Ö½ÚÊı
+// é»˜è®¤çš„æ—¥å¿—è®°å½•æœ€å¤§å­—èŠ‚æ•°
 #define LAGAN_RECORD_MAX_SIZE_DEFAULT 128
 
-// Ä¬ÈÏ¹ıÂË¼¶±ğ
+// é»˜è®¤è¿‡æ»¤çº§åˆ«
 #define LAGAN_FILTER_LEVEL_DEAFULT LAGAN_LEVEL_DEBUG
 
 #define LD(tag, format, ...) LaganPrint(tag, LAGAN_LEVEL_DEBUG, format, ##__VA_ARGS__)
 #define LI(tag, format, ...) LaganPrint(tag, LAGAN_LEVEL_INFO, format, ##__VA_ARGS__)
 #define LW(tag, format, ...) LaganPrint(tag, LAGAN_LEVEL_WARN, format, ##__VA_ARGS__)
 #define LE(tag, format, ...) LaganPrint(tag, LAGAN_LEVEL_ERROR, format, ##__VA_ARGS__)
+#define LR(format, ...) LaganRaw(format, ##__VA_ARGS__)
 
 #pragma pack(1)
 
-// ¶ÁÈ¡Ê±¼ä.24Ğ¡Ê±ÖÆ
+// è¯»å–æ—¶é—´.24å°æ—¶åˆ¶
 typedef struct {
-    // ÄêÊÇ4Î»Êı,¸ñÊ½Èç2020
+    // å¹´æ˜¯4ä½æ•°,æ ¼å¼å¦‚2020
     int Year;
     int Month;
     int Day;
@@ -48,39 +49,42 @@ typedef struct {
 
 #pragma pack()
 
-// LaganPrintFunc ´òÓ¡Êı¾İÀàĞÍ
+// LaganPrintFunc æ‰“å°æ•°æ®ç±»å‹
 typedef void (*LaganPrintFunc)(uint8_t* bytes, int size);
 
-// LaganTime ¶ÁÈ¡Ê±¼ä
+// LaganTime è¯»å–æ—¶é—´
 typedef LaganTime (*LaganGetTimeFunc)(void);
 
-// LaganGetLocalTimeFunc ¶ÁÈ¡±¾µØÊ±¼ä.·µ»ØÖµÊÇus¼¶¾«¶ÈµÄ±¾µØÊ±¼ä
+// LaganGetLocalTimeFunc è¯»å–æœ¬åœ°æ—¶é—´.è¿”å›å€¼æ˜¯usçº§ç²¾åº¦çš„æœ¬åœ°æ—¶é—´
 typedef uint64_t (*LaganGetLocalTimeFunc)(void);
 
-// LaganLoad Ä£¿éÔØÈë
-// getTimeÊÇ¶ÁÈ¡±±¾©Ê±¼ä,getLocalTimeÊÇ¶ÁÈ¡±¾µØÊ±¼ä,½ø¶ÈÊÇus
-// Èç¹û²»ĞèÒªÊ¹ÓÃÄÄ¸öÊ±¼ä,¾Í½«ÆäÉèÖÃÎªNULL.Èç¹ûÁ½¸ö¶¼ÓĞĞ§,ÔòÊ¹ÓÃµÄÊÇ±±¾©Ê±¼ä
+// LaganLoad æ¨¡å—è½½å…¥
+// getTimeæ˜¯è¯»å–åŒ—äº¬æ—¶é—´,getLocalTimeæ˜¯è¯»å–æœ¬åœ°æ—¶é—´,è¿›åº¦æ˜¯us
+// å¦‚æœä¸éœ€è¦ä½¿ç”¨å“ªä¸ªæ—¶é—´,å°±å°†å…¶è®¾ç½®ä¸ºNULL.å¦‚æœä¸¤ä¸ªéƒ½æœ‰æ•ˆ,åˆ™ä½¿ç”¨çš„æ˜¯åŒ—äº¬æ—¶é—´
 void LaganLoad(LaganPrintFunc print, LaganGetTimeFunc getTime, LaganGetLocalTimeFunc getLocalTime);
 
-// LaganSetFilterLevel ÉèÖÃ¹ıÂËÈÕÖ¾µÈ¼¶
+// LaganSetFilterLevel è®¾ç½®è¿‡æ»¤æ—¥å¿—ç­‰çº§
 void LaganSetFilterLevel(LaganLevel level);
 
-// PaxGetFilterLevel ÏÔÊ¾¹ıÂËÈÕÖ¾µÈ¼¶
+// PaxGetFilterLevel æ˜¾ç¤ºè¿‡æ»¤æ—¥å¿—ç­‰çº§
 LaganLevel LaganGetFilterLevel(void);
 
-// LaganPrint ÈÕÖ¾´òÓ¡
+// LaganPrint æ—¥å¿—æ‰“å°
 void LaganPrint(char* tag, LaganLevel level, char *format, ...);
 
-// LaganPrintHex ´òÓ¡×Ö½ÚÁ÷
+// LaganPrintHex æ‰“å°å­—èŠ‚æµ
 void LaganPrintHex(char* tag, LaganLevel level, uint8_t* bytes, int size);
 
-// PaxPause ÔİÍ£ÈÕÖ¾´òÓ¡
+// PaxPause æš‚åœæ—¥å¿—æ‰“å°
 void LaganPause(void);
 
-// PaxResume »Ö¸´ÈÕÖ¾´òÓ¡
+// PaxResume æ¢å¤æ—¥å¿—æ‰“å°
 void LaganResume(void);
 
-// PaxIsPause ÊÇ·ñÔİÍ£
+// PaxIsPause æ˜¯å¦æš‚åœ
 bool LaganIsPause(void);
+
+// LaganRaw åŸå§‹æ‰“å°.æ— æ—¶é—´æˆ³å’Œæ¨¡å—ä¿¡æ¯
+void LaganRaw(char *format, ...);
 
 #endif
